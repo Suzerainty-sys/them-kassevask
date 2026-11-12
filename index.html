@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kassevask & Egenkontrol</title>
+
+    <!-- PWA / Tablet Fuldskærm -->
+    <meta name="theme-color" content="#1E4363">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        .row-init { width: 58px; padding: 6px 4px; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; border: 1px solid #CBD5E1; border-radius: 6px; background: #F8FAFC; }
+        .row-init:focus { outline: none; border-color: #10B981; background: #FFFFFF; }
+
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
+        body { margin: 0; padding: 0; background-color: #F3F5F8; color: #1E293B; min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* TOPBAR (MOBIL) */
+        .topbar { background: #1E4363; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #325D82; }
+        .topbar h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.4px; }
+        .topbar span { font-size: 14px; color: #CBD5E1; font-weight: 700; background: #15324B; padding: 4px 10px; border-radius: 8px; }
+
+        /* YDRE APP-RAMME */
+        .app-shell { display: flex; flex: 1; width: 100%; }
+
+        /* TABLET SIDEPANEL (Skjult på mobil / i portrætvisning) */
+        .tablet-sidebar {
+            display: none;
+            width: 280px;
+            background: #1E4363;
+            color: white;
+            padding: 24px 18px;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid #15324B;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand { padding-bottom: 18px; border-bottom: 1px solid #325D82; margin-bottom: 18px; }
+        .sidebar-brand h2 { margin: 0; font-size: 20px; font-weight: 800; color: #FFFFFF; }
+        .sidebar-brand p { margin: 4px 0 0 0; font-size: 13px; color: #94B4D1; font-weight: 600; }
+
+        .sidebar-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94B4D1; margin-bottom: 10px; }
+
+        .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
+        .side-doc-btn {
+            background: #15324B;
+            border: 1px solid #3A6890;
+            color: #FFFFFF;
+            padding: 15px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .side-doc-btn:active { transform: scale(0.98); background: #2A5880; }
+        .side-doc-btn.primary-doc { background: #0284C7; border-color: #38BDF8; }
+
+        .sidebar-footer { font-size: 12px; color: #94B4D1; background: #15324B; padding: 12px; border-radius: 10px; text-align: center; }
+
+        /* HOVEDOMRÅDE (PORTRAIT SOM STANDARD) */
+        .main-workspace { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 20px; max-width: 720px; width: 100%; margin: 0 auto; }
+
+        .panel { background: white; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); border-top: 8px solid #10B981; }
+        .panel-header { margin-bottom: 16px; }
+        .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; color: #0F172A; }
+        .panel-header p { margin: 6px 0 0 0; font-size: 14px; color: #64748B; }
+
+        .section-label { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #64748B; margin: 12px 0 12px 0; letter-spacing: 0.5px; }
+
+        /* STORE TOUCH-KNAPPER */
+        .btn-stack { display: flex; flex-direction: column; gap: 16px; }
+        .touch-btn { border: none; border-radius: 14px; padding: 26px 20px; font-size: 19px; font-weight: 800; color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .touch-btn:active { transform: scale(0.98); }
+        .touch-btn small { font-size: 13px; font-weight: 500; opacity: 0.92; }
+
+        .btn-green { background: #10B981; }
+        .btn-emerald-dark { background: #047857; }
+
+        .panel-footer { background: #F8FAFC; padding: 12px; border-radius: 10px; font-size: 13px; color: #64748B; text-align: center; margin-top: 18px; }
+
+        /* TABLET LANDSCAPE REGEL (VISER SIDEPANEL & SIDESTILLER KNAPPER) */
+        @media (min-width: 768px) and (orientation: landscape) {
+            .topbar { display: none; }
+            .tablet-sidebar { display: flex; }
+            .main-workspace { max-width: none; padding: 32px 40px; }
+            .panel { height: 100%; justify-content: center; padding: 36px; }
+            .btn-stack { flex-direction: row; gap: 24px; }
+            .touch-btn { flex: 1; padding: 44px 24px; font-size: 22px; }
+        }
+
+        /* POP-UP MODAL TIL VALG AF ANTAL PALLER */
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); display: none; justify-content: center; align-items: center; z-index: 100; padding: 16px; }
+        .modal-card { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .modal-title { font-size: 22px; font-weight: 800; margin: 0 0 6px 0; }
+        .modal-sub { font-size: 14px; color: #64748B; margin: 0 0 24px 0; }
+
+        .counter-row { display: flex; justify-content: center; align-items: center; gap: 18px; margin-bottom: 28px; }
+        .btn-step { width: 68px; height: 68px; border-radius: 16px; border: none; background: #E2E8F0; font-size: 34px; font-weight: 800; color: #0F172A; cursor: pointer; }
+        .btn-step:active { background: #CBD5E1; }
+
+        .count-input { font-size: 40px; font-weight: 900; width: 115px; height: 68px; text-align: center; color: #0F172A; border: 2px solid #CBD5E1; border-radius: 16px; background: #F8FAFC; }
+        .count-input:focus { outline: none; border-color: #10B981; background: #FFFFFF; }
+        .count-input::-webkit-inner-spin-button, .count-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .modal-actions { display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; }
+        .btn-cancel { background: #94A3B8; color: white; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .btn-confirm { background: #10B981; color: white; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
+
+        /* RENGØRINGSMODAL & BLANKET-MODALER */
+        .clean-modal-card { background: white; border-radius: 18px; padding: 20px; width: 96vw; max-width: 780px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
+        .clean-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E2E8F0; padding-bottom: 12px; margin-bottom: 12px; }
+        .clean-header h3 { margin: 0; font-size: 18px; color: #0F172A; }
+        .clean-scroll { overflow-y: auto; overflow-x: auto; flex: 1; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #0F172A; color: white; padding: 10px 4px; position: sticky; top: 0; z-index: 5; }
+        td { border: 1px solid #E2E8F0; padding: 8px; }
+        .zone-row td { background: #E0F2FE; font-weight: 800; color: #0369A1; font-size: 13px; }
+        .chk-cell { text-align: center; width: 42px; }
+        .chk-cell input { width: 22px; height: 22px; cursor: pointer; accent-color: #10B981; }
+
+        .clean-footer { display: flex; flex-direction: column; gap: 10px; border-top: 2px solid #E2E8F0; padding-top: 14px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+
+    <!-- MOBIL TOPBAR (Skjules automatisk på tablet i landscape) -->
+    <div class="topbar">
+        <h1 id="FirmaHeader">Logistikportal — Kassevask</h1>
+        <span id="TxtUgeTop">Uge --</span>
+    </div>
+
+    <div class="app-shell">
+
+        <!-- TABLET SIDEPANEL (Vises kun på tablet i landscape-visning) -->
+        <aside class="tablet-sidebar">
+            <div>
+                <div class="sidebar-brand">
+                    <h2 id="SidebarFirmaHeader">Them Mejeri</h2>
+                    <p id="TxtUgeSidebar">Kassevask • Uge --</p>
+                </div>
+
+                <div class="sidebar-label">Egenkontrol &amp; Blanketter</div>
+                <nav class="sidebar-nav">
+                    <button class="side-doc-btn primary-doc" onclick="aabneRengoeringSkema()">
+                        <span>📋</span>
+                        <span>Rengørings skema</span>
+                    </button>
+
+                    <button class="side-doc-btn" onclick="aabnTempMsSkema()">
+                        <span>🌡️</span>
+                        <span>Registrér temperatur/Sim</span>
+                    </button>
+
+                    <button class="side-doc-btn" onclick="aabnBlanketModal('TTU-Blanketter')">
+                        <span>📑</span>
+                        <span>TTU-Blanketter</span>
+                    </button>
+
+                    <button class="side-doc-btn" onclick="aabnBlanketModal('Afvigelsesblanketter')">
+                        <span>⚠️</span>
+                        <span>Afvigelsesblanketter</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                Sendes direkte til ledelsens arkiv
+            </div>
+        </aside>
+
+        <main class="main-workspace">
+            <div class="panel">
+                <div>
+                    <div class="panel-header">
+                        <h2>🧼 KASSEVASK &amp; MODTAGELSE</h2>
+                        <p>Registrer vaskede Them-paller eller eksterne Arla-paller ind i kassehallen</p>
+                    </div>
+
+                    <div class="section-label">Indsæt paller i kassehallen (+)</div>
+                    <div class="btn-stack">
+                        <button class="touch-btn btn-green" onclick="aabnPalleModal('Them', 78)">
+                            <span>📥 Indsæt vaskede Them-paller</span>
+                            <small>78 kasser pr. palle (Vaskehal)</small>
+                        </button>
+                        <button class="touch-btn btn-emerald-dark" onclick="aabnPalleModal('Arla', 90)">
+                            <span>🚚 Indsæt leverede Arla-paller</span>
+                            <small>90 kasser pr. palle (Ekstern leverance)</small>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-footer">
+                    Kassevask tilføjer udelukkende paller til kassehallens saldo.
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- MODAL 1: ANTAL PALLER -->
+    <div class="modal-backdrop" id="PalleModal">
+        <div class="modal-card">
+            <h3 class="modal-title" id="ModalTitel">Indsæt Them-paller</h3>
+            <p class="modal-sub" id="ModalSub">78 kasser pr. palle</p>
+
+            <div class="counter-row">
+                <button class="btn-step" onclick="justerAntal(-1)">−</button>
+                <input type="number" id="TxtAntalPaller" class="count-input" value="1" min="1" inputmode="numeric" pattern="[0-9]*" onfocus="this.select()">
+                <button class="btn-step" onclick="justerAntal(1)">+</button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="lukPalleModal()">Annuller</button>
+                <button class="btn-confirm" id="BtnGodkendPaller" onclick="sendTilSkyen()">✔ Godkend</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: EGENKONTROL RENGØRINGSSKEMA -->
+    <div class="modal-backdrop" id="RengoeringModal">
+        <div class="clean-modal-card">
+            <div class="clean-header">
+                <h3 id="TxtUgeHeader">Egenkontrol — Uge --</h3>
+                <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukRengoeringModal()">✕ Luk</button>
+            </div>
+
+            <div class="clean-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Kontrolpunkt</th>
+                            <th>Man</th>
+                            <th>Tir</th>
+                            <th>Ons</th>
+                            <th>Tor</th>
+                            <th>Fre</th>
+                            <th>Lør</th>
+                            <th>Søn</th>
+                            <th>Init.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="SkemaBody"></tbody>
+                </table>
+            </div>
+
+            <div class="clean-footer">
+                <button class="btn-confirm" id="BtnGemRengoering" style="width: 100%; padding: 16px;" onclick="gemRengoeringISkyen()">✔ Afslut Uge &amp; Send til Ledelse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: KLARGJORT RAMME TIL DINE 3 NYE BLANKETTER -->
+    <div class="modal-backdrop" id="BlanketModal">
+        <div class="clean-modal-card">
+            <div class="clean-header">
+                <h3 id="BlanketModalTitel">Blanket</h3>
+                <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukBlanketModal()">✕ Luk</button>
+            </div>
+
+            <div class="clean-scroll" id="BlanketModalIndhold" style="padding: 20px; text-align: center; color: #64748B;">
+                <p style="font-size: 16px; font-weight: 600; color: #1E293B;">Klar til opsætning af blanket</p>
+                <p style="font-size: 14px;">Send billedet af denne blanket, så bygger vi felterne ind her.</p>
+            </div>
+
+            <div class="clean-footer">
+                <button class="btn-confirm" style="width: 100%; padding: 16px;" onclick="lukBlanketModal()">✔ Send til Ledelse (Afventer felter)</button>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL 4: TEMPERATUR & MS BLANKET (AFSNIT 23.21) -->
+    <div class="modal-backdrop" id="TempMsModal">
+        <div class="clean-modal-card" style="max-width: 820px;">
+            <div class="clean-header">
+                <div>
+                    <h3 style="margin:0;">Kvittering af Temperatur – samt MS på vaskemaskinen</h3>
+                    <small style="color:#64748B; font-weight:600;">Them Mejeri • Afsnit: 23.21 • Udgave: 4 (Dato: 08-01-2025)</small>
+                </div>
+                <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukTempMsModal()">✕ Luk</button>
+            </div>
+
+            <!-- Lovpligtig kontroltekst fra blanketten -->
+            <div style="background:#F1F5F9; border:1px solid #CBD5E1; border-left:5px solid #0284C7; padding:12px 14px; border-radius:8px; margin-bottom:14px; font-size:13px; color:#0F172A; font-weight:600;">
+                Der skal 3 gange dagligt tjekkes, at temperaturen ligger inden for <u>60–72 grader</u> – samt MS skal ligge mellem <u>3,0 til 4,0</u>. Afviges dette, tages der fat i nærmeste leder.
+            </div>
+
+            <div class="clean-scroll">
+                <table>
+                                       <thead>
+                        <tr>
+                            <th style="width: 26%;">Dato &amp; Tid</th>
+                            <th style="width: 25%;">Temperatur (60,0–72,0 °C)</th>
+                            <th style="width: 25%;">MS (3,00–4,00)</th>
+                            <th style="width: 24%;">Kvittering med initialer</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="TempMsBody"></tbody>
+                </table>
+
+                <button type="button" onclick="tilfoejTempMsRaekke()" style="margin-top:12px; background:#E2E8F0; color:#0F172A; border:none; padding:12px 16px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; width:100%;">
+                    ➕ Tilføj ny kontrolrække (3x dagligt)
+                </button>
+            </div>
+
+            <div class="clean-footer" style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px;">
+                <button type="button" onclick="gemTempMsKladde(true)" style="background:#0284C7; color:white; border:none; border-radius:14px; padding:16px; font-size:15px; font-weight:700; cursor:pointer;">
+                    💾 Gem kladde til næste tjek
+                </button>
+                <button type="button" class="btn-confirm" id="BtnGemTempMs" onclick="gemTempMsISkyen()">
+                    ✔ Afslut &amp; Send til Ledelse
+                </button>
+            </div>
+        </div>
+    </div>
+
+        <script>
+        const SUPABASE_URL = "https://supabase.co";
+        const SUPABASE_KEY = "sb_publishable_WtPN9JEmymnRQP-wcFOlOQ_zPHL823K";
+
+        let _valgtPalleNavn = "";
+        let _kasserPrPalle = 0;
+        let _aktuelUge = 1;
+        let _aktivtFirma = "Logistikportal";
+
+        function beregnUgeNummer(dato) {
+            const d = new Date(Date.UTC(dato.getFullYear(), dato.getMonth(), dato.getDate()));
+            const dagNr = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dagNr);
+            const aarStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - aarStart) / 86400000) + 1) / 7);
+        }
+
+        _aktuelUge = beregnUgeNummer(new Date());
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.location.protocol.startsWith("http")) {
+                const manifestLink = document.createElement("link");
+                manifestLink.rel = "manifest";
+                manifestLink.href = "manifest.json";
+                document.head.appendChild(manifestLink);
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const firmaFraUrl = urlParams.get('firma');
+            if (firmaFraUrl && firmaFraUrl.trim() !== "") {
+                localStorage.setItem('valgtFirmaNavn', firmaFraUrl.trim());
+            }
+
+            _aktivtFirma = localStorage.getItem('valgtFirmaNavn') || "Logistikportal";
+            document.title = _aktivtFirma + " - Kassevask";
+            document.getElementById('FirmaHeader').innerText = _aktivtFirma + " — Kassevask";
+            document.getElementById('TxtUgeTop').innerText = "Uge " + _aktuelUge;
+
+            const sbFirma = document.getElementById('SidebarFirmaHeader');
+            const sbUge = document.getElementById('TxtUgeSidebar');
+            if (sbFirma) sbFirma.innerText = _aktivtFirma;
+            if (sbUge) sbUge.innerText = "Kassevask • Uge " + _aktuelUge;
+
+            bygRengoeringsTabel();
+        });
+
+        function aabnBlanketModal(titel) {
+            document.getElementById('BlanketModalTitel').innerText = titel + " — Uge " + _aktuelUge;
+            document.getElementById('BlanketModal').style.display = 'flex';
+        }
+
+        function lukBlanketModal() {
+            document.getElementById('BlanketModal').style.display = 'none';
+        }
+
+        function aabnPalleModal(navn, kasser) {
+            _valgtPalleNavn = navn;
+            _kasserPrPalle = kasser;
+            document.getElementById('TxtAntalPaller').value = 1;
+            document.getElementById('ModalTitel').innerText = "INDSÆT: " + navn + "-paller";
+            document.getElementById('ModalSub').innerText = kasser + " kasser pr. palle — Tilføjes i kassehal";
+            document.getElementById('PalleModal').style.display = 'flex';
+        }
+
+        function lukPalleModal() {
+            document.getElementById('PalleModal').style.display = 'none';
+        }
+
+        function justerAntal(delta) {
+            const input = document.getElementById('TxtAntalPaller');
+            let nuvaerende = parseInt(input.value) || 0;
+            nuvaerende += delta;
+            if (nuvaerende < 1) nuvaerende = 1;
+            input.value = nuvaerende;
+        }
+
+        async function sendTilSkyen() {
+            const antalPaller = parseInt(document.getElementById('TxtAntalPaller').value);
+            if (!antalPaller || antalPaller < 1) {
+                alert("⚠️ Indtast venligst et gyldigt antal paller (mindst 1).");
+                return;
+            }
+
+            const btn = document.getElementById('BtnGodkendPaller');
+            btn.disabled = true;
+            btn.innerText = "⏳ Gemmer...";
+
+            const samletAntalKasser = antalPaller * _kasserPrPalle;
+
+            try {
+                const response = await fetch(SUPABASE_URL + "/rest/v1/kasselog", {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        afdeling: "Kassevask",
+                        palletype: _valgtPalleNavn,
+                        antal_paller: antalPaller,
+                        antal_kasser: samletAntalKasser
+                    })
+                });
+
+                if (!response.ok) throw new Error(await response.text());
+
+                lukPalleModal();
+                alert("✔ Registreret: " + antalPaller + " " + _valgtPalleNavn + "-paller indsat i kassehallen!");
+            } catch (err) {
+                alert("Fejl ved lagring: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "✔ Godkend";
+            }
+        }
+        function bygRengoeringsTabel() {
+            const zoner = [
+                {
+                    titel: "1. ROBOTLINJEN",
+                    prefix: "r",
+                    punkter: [
+                        "Fjernelse/spuling af rester fra gulv",
+                        "Vask af gulv",
+                        "Spuling af hele robotlinjen inkl. bånd",
+                        "Udlægning af skumprodukter jf. procedure",
+                        "Visuel kontrol efter endt rengøring"
+                    ]
+                },
+                {
+                    titel: "2. ALULINJEN",
+                    prefix: "a",
+                    punkter: [
+                        "Fjernelse/spuling af rester fra gulv",
+                        "Vask af gulv",
+                        "Spuling af hele Alulinjen inkl. bånd",
+                        "Udlægning af skumprodukter jf. procedure",
+                        "Visuel kontrol efter endt rengøring"
+                    ]
+                },
+                {
+                    titel: "3. FLOWPAKLINJEN INKL. HØVLOMRÅDE",
+                    prefix: "f",
+                    punkter: [
+                        "Fjernelse/spuling af rester fra gulv",
+                        "Vask af gulv",
+                        "Aftørring af indløbsbånd i begge ender",
+                        "Rensning af kniv efter endt arbejde",
+                        "Udlægning af skumprodukter jf. procedure"
+                    ]
+                }
+            ];
+
+            const tbody = document.getElementById('SkemaBody');
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            zoner.forEach(zone => {
+                const zTr = document.createElement('tr');
+                zTr.className = "zone-row";
+                zTr.innerHTML = '<td colspan="9">' + zone.titel + '</td>';
+                tbody.appendChild(zTr);
+
+                zone.punkter.forEach((punkt, idx) => {
+                    const rowId = zone.prefix + (idx + 1);
+                    const tr = document.createElement('tr');
+                    let cells = '<td>' + punkt + '</td>';
+                    for (let d = 1; d <= 7; d++) {
+                        const cellId = zone.prefix + ((idx * 7) + d);
+                        cells += '<td class="chk-cell"><input type="checkbox" data-id="' + cellId + '" onchange="gemLokalKladde()"></td>';
+                    }
+                    cells += '<td style="text-align:center;"><input type="text" class="row-init" data-rowinit="' + rowId + '" placeholder="Init" maxlength="5" oninput="gemLokalKladde()"></td>';
+                    tr.innerHTML = cells;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function gemLokalKladde() {
+            const valgteIds = [];
+            document.querySelectorAll('.chk-cell input:checked').forEach(chk => {
+                valgteIds.push(chk.getAttribute('data-id'));
+            });
+
+            const raekkeInit = {};
+            document.querySelectorAll('.row-init').forEach(inp => {
+                const val = inp.value.trim().toUpperCase();
+                if (val) raekkeInit[inp.getAttribute('data-rowinit')] = val;
+            });
+
+            localStorage.setItem('rengoering_kladde_uge_' + _aktuelUge, JSON.stringify({
+                uge: _aktuelUge,
+                checked: valgteIds,
+                rowInits: raekkeInit
+            }));
+        }
+
+        function aabneRengoeringSkema() {
+            const headerEl = document.getElementById('TxtUgeHeader');
+            if (headerEl) headerEl.innerText = _aktivtFirma + " | Egenkontrol — UGE " + _aktuelUge;
+
+            document.querySelectorAll('.chk-cell input').forEach(chk => chk.checked = false);
+            document.querySelectorAll('.row-init').forEach(inp => inp.value = "");
+
+            const gemtTekst = localStorage.getItem('rengoering_kladde_uge_' + _aktuelUge);
+            if (gemtTekst) {
+                try {
+                    const kladde = JSON.parse(gemtTekst);
+                    if (kladde.checked) {
+                        kladde.checked.forEach(id => {
+                            const el = document.querySelector('input[data-id="' + id + '"]');
+                            if (el) el.checked = true;
+                        });
+                    }
+                    if (kladde.rowInits) {
+                        Object.keys(kladde.rowInits).forEach(rId => {
+                            const inp = document.querySelector('input[data-rowinit="' + rId + '"]');
+                            if (inp) inp.value = kladde.rowInits[rId];
+                        });
+                    }
+                } catch (e) {
+                    localStorage.removeItem('rengoering_kladde_uge_' + _aktuelUge);
+                }
+            }
+
+            document.getElementById('RengoeringModal').style.display = 'flex';
+        }
+
+        function lukRengoeringModal() {
+            document.getElementById('RengoeringModal').style.display = 'none';
+        }
+
+        async function gemRengoeringISkyen() {
+            const dage = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
+            const raekker = ["r", "a", "f"];
+            let dataPakke = "";
+            let fundneInitialer = new Set();
+
+            for (const prefix of raekker) {
+                for (let r = 1; r <= 5; r++) {
+                    const rowId = prefix + r;
+                    let raekkeDage = [];
+                    for (let d = 1; d <= 7; d++) {
+                        let id = prefix + (((r - 1) * 7) + d);
+                        let el = document.querySelector('input[data-id="' + id + '"]');
+                        if (el && el.checked) raekkeDage.push(dage[d - 1]);
+                    }
+
+                    const initEl = document.querySelector('input[data-rowinit="' + rowId + '"]');
+                    const rInit = initEl ? initEl.value.trim().toUpperCase() : "";
+
+                    if (raekkeDage.length > 0 && !rInit) {
+                        alert("⚠️ Du mangler at skrive initialer på én eller flere afkrydsede rækker!");
+                        if (initEl) initEl.focus();
+                        return;
+                    }
+
+                    if (rInit) fundneInitialer.add(rInit);
+                    dataPakke += rowId + ":" + (raekkeDage.length > 0 ? raekkeDage.join(",") : "-") + "|" + (rInit || "-") + ";";
+                }
+            }
+
+            const samletInit = fundneInitialer.size > 0 ? Array.from(fundneInitialer).join(", ") : "-";
+            const fuldStreng = "INIT:" + samletInit + "#" + dataPakke;
+
+            const btn = document.getElementById('BtnGemRengoering');
+            btn.disabled = true;
+            btn.innerText = "⏳ Sender...";
+
+            try {
+                const response = await fetch(SUPABASE_URL + "/rest/v1/rengoering_kassevask", {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ uge: _aktuelUge, initialer: fuldStreng })
+                });
+
+                if (!response.ok) throw new Error(await response.text());
+
+                localStorage.removeItem('rengoering_kladde_uge_' + _aktuelUge);
+                lukRengoeringModal();
+                alert("✔ EGENKONTROL GEMT:\nRengøringsskemaet for uge " + _aktuelUge + " er sendt til ledelsen!");
+            } catch (err) {
+                alert("Fejl ved gem af egenkontrol: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "✔ Afslut Uge & Send til Ledelse";
+            }
+        }
+               /* TEMPERATUR & MS BLANKET */
+        function aabnTempMsSkema() {
+            const tbody = document.getElementById('TempMsBody');
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            const gemt = localStorage.getItem('temp_ms_kladde_uge_' + _aktuelUge);
+            if (gemt) {
+                try {
+                    const raekker = JSON.parse(gemt);
+                    if (raekker.length > 0) {
+                        raekker.forEach(r => tilfoejTempMsRaekke(r.dato, r.temp, r.ms, r.init));
+                    } else {
+                        tilfoejTempMsRaekke();
+                    }
+                } catch (e) {
+                    tilfoejTempMsRaekke();
+                }
+            } else {
+                tilfoejTempMsRaekke();
+            }
+
+            document.getElementById('TempMsModal').style.display = 'flex';
+        }
+
+        function lukTempMsModal() {
+            gemTempMsKladde(false);
+            document.getElementById('TempMsModal').style.display = 'none';
+        }
+
+        function tilfoejTempMsRaekke(datoVal, tempVal, msVal, initVal) {
+            const tbody = document.getElementById('TempMsBody');
+            if (!tbody) return;
+
+            if (!datoVal) {
+                const nu = new Date();
+                const dag = String(nu.getDate()).padStart(2, '0');
+                const mdr = String(nu.getMonth() + 1).padStart(2, '0');
+                const kl = String(nu.getHours()).padStart(2, '0') + ":" + String(nu.getMinutes()).padStart(2, '0');
+                datoVal = dag + "-" + mdr + " kl. " + kl;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td><input type="text" class="tms-dato" value="' + datoVal + '" oninput="gemTempMsKladde(false)" style="width:100%; padding:8px; border:1px solid #CBD5E1; border-radius:6px; font-weight:600; text-align:center;"></td>' +
+                '<td style="text-align:center;"><input type="number" step="0.1" inputmode="decimal" class="tms-temp" value="' + (tempVal || '') + '" placeholder="00,0" onblur="formaterTemp(this)" oninput="gemTempMsKladde(false)" style="width:95px; padding:8px; border:1px solid #CBD5E1; border-radius:6px; font-size:15px; font-weight:700; text-align:center;"></td>' +
+                '<td style="text-align:center;"><input type="number" step="0.01" inputmode="decimal" class="tms-ms" value="' + (msVal || '') + '" placeholder="0,00" onblur="formaterMs(this)" oninput="gemTempMsKladde(false)" style="width:95px; padding:8px; border:1px solid #CBD5E1; border-radius:6px; font-size:15px; font-weight:700; text-align:center;"></td>' +
+                '<td style="text-align:center;"><input type="text" class="row-init tms-init" value="' + (initVal || '') + '" placeholder="Init" maxlength="5" oninput="gemTempMsKladde(false)" style="width:80px;"></td>';
+            tbody.appendChild(tr);
+
+            if (tempVal) formaterTemp(tr.querySelector('.tms-temp'));
+            if (msVal) formaterMs(tr.querySelector('.tms-ms'));
+        }
+
+        function formaterTemp(el) {
+            if (!el || el.value === "") return;
+            const tal = parseFloat(el.value.replace(',', '.'));
+            if (!isNaN(tal)) {
+                el.value = tal.toFixed(1);
+                el.style.borderColor = (tal < 60.0 || tal > 72.0) ? "#DC2626" : "#10B981";
+                el.style.backgroundColor = (tal < 60.0 || tal > 72.0) ? "#FEF2F2" : "#F0FDF4";
+            }
+            gemTempMsKladde(false);
+        }
+
+        function formaterMs(el) {
+            if (!el || el.value === "") return;
+            const tal = parseFloat(el.value.replace(',', '.'));
+            if (!isNaN(tal)) {
+                el.value = tal.toFixed(2);
+                el.style.borderColor = (tal < 3.00 || tal > 4.00) ? "#DC2626" : "#10B981";
+                el.style.backgroundColor = (tal < 3.00 || tal > 4.00) ? "#FEF2F2" : "#F0FDF4";
+            }
+            gemTempMsKladde(false);
+        }
+
+        function hentTempMsRaekkerFraDom() {
+            const data = [];
+            document.querySelectorAll('#TempMsBody tr').forEach(tr => {
+                const dato = tr.querySelector('.tms-dato').value.trim();
+                const temp = tr.querySelector('.tms-temp').value.trim();
+                const ms = tr.querySelector('.tms-ms').value.trim();
+                const init = tr.querySelector('.tms-init').value.trim().toUpperCase();
+                if (temp || ms || init) {
+                    data.push({ dato: dato, temp: temp, ms: ms, init: init });
+                }
+            });
+            return data;
+        }
+
+        function gemTempMsKladde(visBesked) {
+            const data = hentTempMsRaekkerFraDom();
+            localStorage.setItem('temp_ms_kladde_uge_' + _aktuelUge, JSON.stringify(data));
+            if (visBesked) {
+                alert("💾 Kladde gemt på tabletten! Du kan fortsætte næste tjek senere på dagen.");
+            }
+        }
+
+        async function gemTempMsISkyen() {
+            const raekker = hentTempMsRaekkerFraDom();
+            if (raekker.length === 0) {
+                alert("⚠️ Indtast venligst mindst én måling før afsendelse.");
+                return;
+            }
+
+            for (const r of raekker) {
+                if ((r.temp || r.ms) && !r.init) {
+                    alert("⚠️ Alle udfyldte rækker skal kvitteres med initialer!");
+                    return;
+                }
+            }
+
+            const btn = document.getElementById('BtnGemTempMs');
+            btn.disabled = true;
+            btn.innerText = "⏳ Sender...";
+
+            try {
+                const response = await fetch(SUPABASE_URL + "/rest/v1/temperatur_ms_kassevask", {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        uge: _aktuelUge,
+                        registreringer: JSON.stringify(raekker)
+                    })
+                });
+
+                if (!response.ok) throw new Error(await response.text());
+
+                localStorage.removeItem('temp_ms_kladde_uge_' + _aktuelUge);
+                document.getElementById('TempMsModal').style.display = 'none';
+                alert("✔ KVITTERING SENDT:\nTemperatur- og MS-skema for uge " + _aktuelUge + " er gemt hos ledelsen!");
+            } catch (err) {
+                alert("Fejl ved afsendelse: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "✔ Afslut & Send til Ledelse";
+            }
+        }
+    </script>
+</body>
+</html>
+
