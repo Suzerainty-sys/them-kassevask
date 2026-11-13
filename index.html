@@ -261,8 +261,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: KLARGJORT RAMME TIL DINE 3 NYE BLANKETTER -->
-      <!-- MODAL 5: SIKKERHEDSREGISTRERING (TTU / ULYKKE) -->
+         <!-- MODAL 3: SIKKERHEDSREGISTRERING (TTU / ULYKKE) -->
     <div class="modal-backdrop" id="TtuModal">
         <div class="clean-modal-card" style="max-width: 860px;">
             <div class="clean-header" style="background:#1E4363; color:white; padding:14px 18px; border-radius:10px;">
@@ -421,120 +420,7 @@
             </div>
         </div>
     </div>
-    <!-- MODAL 5: SIKKERHEDSREGISTRERING (TTU / ULYKKE) -->
-    <div class="modal-backdrop" id="TtuModal">
-        <div class="clean-modal-card" style="max-width: 860px;">
-            <div class="clean-header" style="background:#1E4363; color:white; padding:14px 18px; border-radius:10px;">
-                <div>
-                    <h3 style="margin:0; color:white;">SIKKERHEDSREGISTRERING – MEJERI</h3>
-                    <small style="color:#CBD5E1;">Registrering af tilløb til ulykke (TTU) samt ulykker med og uden fravær</small>
-                </div>
-                <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukTtuModal()">✕ Luk</button>
-            </div>
-
-            <div class="clean-scroll" style="padding-right:6px;">
-                <!-- 1. HÆNDELSESTYPE -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">1. HÆNDELSESTYPE (Vælg én)</div>
-                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px; padding:0 4px;">
-                    <label style="display:flex; align-items:center; gap:10px; font-weight:600; font-size:14px; cursor:pointer;">
-                        <input type="radio" name="ttuType" value="TTU – Tilløb til ulykke / Nærved-ulykke" checked style="width:20px; height:20px;">
-                        <span>TTU – Tilløb til ulykke / Nærved-ulykke (Ingen skade, men det var tæt på)</span>
-                    </label>
-                    <label style="display:flex; align-items:center; gap:10px; font-weight:600; font-size:14px; cursor:pointer;">
-                        <input type="radio" name="ttuType" value="Ulykke UDEN fravær" style="width:20px; height:20px;">
-                        <span>Ulykke UDEN fravær (Førstehjælp, mindre skramme, lægebesøg uden sygemelding)</span>
-                    </label>
-                    <label style="display:flex; align-items:center; gap:10px; font-weight:600; font-size:14px; cursor:pointer;">
-                        <input type="radio" name="ttuType" value="Ulykke MED fravær / LTI" style="width:20px; height:20px;">
-                        <span>Ulykke MED fravær / LTI (Sygemelding ud over tilskadekomstdagen)</span>
-                    </label>
-                </div>
-
-                <!-- 2. TID, STED OG INVOLVEREDE -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">2. TID, STED OG INVOLVEREDE</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-                    <div>
-                        <label style="font-size:12px; font-weight:700; color:#475569;">Dato og tidspunkt:</label>
-                        <input type="text" id="TtuDato" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-weight:600;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:700; color:#475569;">Indberettet af (Navn / Init):</label>
-                        <input type="text" id="TtuIndberetter" placeholder="Skriv navn eller initialer" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-weight:600;">
-                    </div>
-                </div>
-                <div style="margin-bottom:10px;">
-                    <label style="font-size:12px; font-weight:700; color:#475569;">Involveret / tilskadekommen (navn &amp; stilling):</label>
-                    <input type="text" id="TtuInvolveret" placeholder="Navn og stilling (hvis relevant)" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px;">
-                </div>
-                <div style="margin-bottom:16px;">
-                    <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:6px;">Afdeling / Procesområde:</label>
-                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0;">
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Tårnlager" style="width:18px; height:18px;"> Tårnlager</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Pakkeri" style="width:18px; height:18px;"> Pakkeri</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kit 1" style="width:18px; height:18px;"> Kit 1</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Produktion" style="width:18px; height:18px;"> Produktion</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kølerum" style="width:18px; height:18px;"> Kølerum</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kit 2" style="width:18px; height:18px;"> Kit 2</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Klargøring" style="width:18px; height:18px;"> Klargøring</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kassevask" checked style="width:18px; height:18px;"> Kassevask</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kit 3" style="width:18px; height:18px;"> Kit 3</label>
-                    </div>
-                </div>
-
-                <!-- 3. BESKRIVELSE & FOREBYGGELSE -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">3. BESKRIVELSE &amp; FOREBYGGELSE (Skriv med egne ord)</div>
-                <div style="margin-bottom:10px;">
-                    <label style="font-size:12px; font-weight:700; color:#475569;">Hvad skete der? (Hvad var du i gang med, og hvordan opstod situationen?)</label>
-                    <textarea id="TtuHvadSkete" rows="3" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-size:14px;"></textarea>
-                </div>
-                <div style="margin-bottom:10px;">
-                    <label style="font-size:12px; font-weight:700; color:#475569;">Hvad kunne være gjort anderledes, så hændelsen var undgået?</label>
-                    <textarea id="TtuForebyggelse" rows="2" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-size:14px;"></textarea>
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:16px;">
-                    <div>
-                        <label style="font-size:12px; font-weight:700; color:#475569;">Kun ved personskade – Skadetype &amp; legemsdel:</label>
-                        <input type="text" id="TtuSkade" placeholder="F.eks. snitsår venstre hånd" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:700; color:#475569;">Behandling:</label>
-                        <select id="TtuBehandling" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-weight:600; background:white;">
-                            <option value="Ingen behandling">Ingen behandling</option>
-                            <option value="Førstehjælp på mejeriet">Førstehjælp på mejeriet</option>
-                            <option value="Skadestue / egen læge">Skadestue / egen læge</option>
-                        </select>
-                    </div>
-                </div>
-                <!-- 4. MEJERI-SPECIFIKKE RISIKOFAKTORER -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">4. MEJERI-SPECIFIKKE RISIKOFAKTORER (Sæt gerne flere kryds)</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:16px;">
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Glat gulv / Vådt miljø" style="width:18px; height:18px;"> Glat gulv / Vådt miljø (valle, mælk, vand, sæbe)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Kemi og CIP" style="width:18px; height:18px;"> Kemi og CIP (syre/lud, pakninger, afspærring)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Varme / Kulde" style="width:18px; height:18px;"> Varme / Kulde (damp, varmt vand, køle-/frostrum)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Maskiner og pakkelinjer" style="width:18px; height:18px;"> Maskiner og pakkelinjer (klemfare, bånd, afskærmning)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Ergonomi / tunge løft" style="width:18px; height:18px;"> Ergonomi / tunge løft (oste, sække, kasser, EGA)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Intern trafik" style="width:18px; height:18px;"> Intern trafik (truck, palleløfter, travlhed v. rampe)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Værnemidler / PV" style="width:18px; height:18px;"> Værnemidler / PV (manglende sko, handsker, briller)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Instruktion / Planlægning" style="width:18px; height:18px;"> Instruktion / Planlægning (travlhed, oplæring, SOP)</label>
-                </div>
-
-                <!-- 5. STRAKSHANDLING -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">5. STRAKSHANDLING (Hvad blev gjort her og nu for at sikre stedet?)</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:8px;">
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Tørret op / rengjort / afspærret område" style="width:18px; height:18px;"> Tørret op / rengjort / afspærret område</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Maskine stoppet / mærket ude af drift" style="width:18px; height:18px;"> Maskine stoppet / mærket ude af drift</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Ydet førstehjælp / sendt til læge" style="width:18px; height:18px;"> Ydet førstehjælp / sendt til læge</label>
-                    <input type="text" id="TtuStraksAndet" placeholder="Andet (skriv kort)..." style="padding:8px; border:1px solid #CBD5E1; border-radius:6px; font-size:13px;">
-                </div>
-                <small style="color:#64748B; display:block; text-align:center; margin-bottom:8px;">Punkt 6–7 (5 x Hvorfor &amp; opfølgning) udfyldes automatisk af AMO / leder i ledelsens Excel-rapport.</small>
-            </div>
-
-            <div class="clean-footer">
-                <button type="button" class="btn-confirm" id="BtnGemTtu" style="width:100%; padding:16px;" onclick="gemTtuISkyen()">✔ Send Sikkerhedsregistrering til Ledelse / AMO</button>
-            </div>
-        </div>
-    </div>
-
+    
 
         <script>
         const SUPABASE_URL = "https://pfzpjcwbeysqfqrzlhba.supabase.co";
