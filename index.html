@@ -3,30 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kassevask & Egenkontrol</title>
+    <title>ThemFlow — Kassevask &amp; Egenkontrol</title>
 
-    <!-- PWA / Tablet Fuldskærm -->
+    <!-- PWA / Tablet Fuldskærm & Ikoner -->
     <meta name="theme-color" content="#1E4363">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ThemFlow Kassevask">
+    <link rel="icon" type="image/jpeg" href="ThemFlowApp.jpg">
+    <link rel="apple-touch-icon" href="ThemFlowApp.jpg">
 
     <style>
         .row-init { width: 58px; padding: 6px 4px; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; border: 1px solid #CBD5E1; border-radius: 6px; background: #F8FAFC; }
-        .row-init:focus { outline: none; border-color: #10B981; background: #FFFFFF; }
+        .row-init:focus { outline: none; border-color: #0284C7; background: #FFFFFF; }
 
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
         body { margin: 0; padding: 0; background-color: #F3F5F8; color: #1E293B; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* TOPBAR (MOBIL) */
+        /* FULDSKÆRMS OPSTARTSSKÆRM (SPLASH SCREEN) */
+        #themflow-splash {
+            position: fixed;
+            inset: 0;
+            background-color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        #themflow-splash img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+        }
+        .splash-track {
+            position: absolute;
+            bottom: 48px;
+            width: 220px;
+            height: 5px;
+            background-color: #E2E8F0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        #splash-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #1E4363;
+            transition: width 1.6s ease-in-out;
+        }
+
         .topbar { background: #1E4363; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #325D82; }
         .topbar h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.4px; }
         .topbar span { font-size: 14px; color: #CBD5E1; font-weight: 700; background: #15324B; padding: 4px 10px; border-radius: 8px; }
 
-        /* YDRE APP-RAMME */
         .app-shell { display: flex; flex: 1; width: 100%; }
 
-        /* TABLET SIDEPANEL (Skjult på mobil / i portrætvisning) */
         .tablet-sidebar {
             display: none;
             width: 280px;
@@ -38,13 +71,10 @@
             border-right: 1px solid #15324B;
             flex-shrink: 0;
         }
-
         .sidebar-brand { padding-bottom: 18px; border-bottom: 1px solid #325D82; margin-bottom: 18px; }
         .sidebar-brand h2 { margin: 0; font-size: 20px; font-weight: 800; color: #FFFFFF; }
         .sidebar-brand p { margin: 4px 0 0 0; font-size: 13px; color: #94B4D1; font-weight: 600; }
-
         .sidebar-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94B4D1; margin-bottom: 10px; }
-
         .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
         .side-doc-btn {
             background: #15324B;
@@ -63,31 +93,22 @@
         }
         .side-doc-btn:active { transform: scale(0.98); background: #2A5880; }
         .side-doc-btn.primary-doc { background: #0284C7; border-color: #38BDF8; }
-
         .sidebar-footer { font-size: 12px; color: #94B4D1; background: #15324B; padding: 12px; border-radius: 10px; text-align: center; }
-
-        /* HOVEDOMRÅDE (PORTRAIT SOM STANDARD) */
         .main-workspace { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 20px; max-width: 720px; width: 100%; margin: 0 auto; }
-
-        .panel { background: white; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); border-top: 8px solid #10B981; }
+        .panel { background: white; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0; border-top: 8px solid #FFFFFF; }
         .panel-header { margin-bottom: 16px; }
         .panel-header h2 { margin: 0; font-size: 22px; font-weight: 800; color: #0F172A; }
         .panel-header p { margin: 6px 0 0 0; font-size: 14px; color: #64748B; }
-
         .section-label { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #64748B; margin: 12px 0 12px 0; letter-spacing: 0.5px; }
 
-        /* STORE TOUCH-KNAPPER */
         .btn-stack { display: flex; flex-direction: column; gap: 16px; }
         .touch-btn { border: none; border-radius: 14px; padding: 26px 20px; font-size: 19px; font-weight: 800; color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .touch-btn:active { transform: scale(0.98); }
         .touch-btn small { font-size: 13px; font-weight: 500; opacity: 0.92; }
-
-        .btn-green { background: #10B981; }
-        .btn-emerald-dark { background: #047857; }
-
+        .btn-green { background: #0284C7; }
+        .btn-emerald-dark { background: #1E4363; }
         .panel-footer { background: #F8FAFC; padding: 12px; border-radius: 10px; font-size: 13px; color: #64748B; text-align: center; margin-top: 18px; }
 
-        /* TABLET LANDSCAPE REGEL (VISER SIDEPANEL & SIDESTILLER KNAPPER) */
         @media (min-width: 768px) and (orientation: landscape) {
             .topbar { display: none; }
             .tablet-sidebar { display: flex; }
@@ -97,87 +118,70 @@
             .touch-btn { flex: 1; padding: 44px 24px; font-size: 22px; }
         }
 
-        /* POP-UP MODAL TIL VALG AF ANTAL PALLER */
         .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); display: none; justify-content: center; align-items: center; z-index: 100; padding: 16px; }
         .modal-card { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         .modal-title { font-size: 22px; font-weight: 800; margin: 0 0 6px 0; }
         .modal-sub { font-size: 14px; color: #64748B; margin: 0 0 24px 0; }
-
         .counter-row { display: flex; justify-content: center; align-items: center; gap: 18px; margin-bottom: 28px; }
         .btn-step { width: 68px; height: 68px; border-radius: 16px; border: none; background: #E2E8F0; font-size: 34px; font-weight: 800; color: #0F172A; cursor: pointer; }
         .btn-step:active { background: #CBD5E1; }
-
         .count-input { font-size: 40px; font-weight: 900; width: 115px; height: 68px; text-align: center; color: #0F172A; border: 2px solid #CBD5E1; border-radius: 16px; background: #F8FAFC; }
-        .count-input:focus { outline: none; border-color: #10B981; background: #FFFFFF; }
+        .count-input:focus { outline: none; border-color: #0284C7; background: #FFFFFF; }
         .count-input::-webkit-inner-spin-button, .count-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
         .modal-actions { display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; }
         .btn-cancel { background: #94A3B8; color: white; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; }
-        .btn-confirm { background: #10B981; color: white; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
+        .btn-confirm { background: #0284C7; color: white; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
+        .btn-confirm:active { background: #0369A1; }
 
-        /* RENGØRINGSMODAL & BLANKET-MODALER */
         .clean-modal-card { background: white; border-radius: 18px; padding: 20px; width: 96vw; max-width: 780px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
         .clean-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E2E8F0; padding-bottom: 12px; margin-bottom: 12px; }
         .clean-header h3 { margin: 0; font-size: 18px; color: #0F172A; }
         .clean-scroll { overflow-y: auto; overflow-x: auto; flex: 1; }
-
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #0F172A; color: white; padding: 10px 4px; position: sticky; top: 0; z-index: 5; }
+        th { background: #1E4363; color: white; padding: 10px 4px; position: sticky; top: 0; z-index: 5; }
         td { border: 1px solid #E2E8F0; padding: 8px; }
         .zone-row td { background: #E0F2FE; font-weight: 800; color: #0369A1; font-size: 13px; }
         .chk-cell { text-align: center; width: 42px; }
-        .chk-cell input { width: 22px; height: 22px; cursor: pointer; accent-color: #10B981; }
-
+        .chk-cell input { width: 22px; height: 22px; cursor: pointer; accent-color: #0284C7; }
         .clean-footer { display: flex; flex-direction: column; gap: 10px; border-top: 2px solid #E2E8F0; padding-top: 14px; margin-top: 12px; }
+        input[type="text"], input[type="number"], textarea, select { user-select: text; }
+
+        html, body { margin: 0 !important; padding: 0 !important; width: 100vw !important; min-height: 100vh !important; max-width: 100% !important; overflow-x: hidden !important; box-sizing: border-box !important; }
+        *, *::before, *::after { box-sizing: inherit !important; }
+        #TtuModal input[type="text"], #TtuModal textarea, #TtuModal select, #TtuModal .clean-scroll > div > div[style*="grid-template-columns"] { background-color: #FFFFFF !important; border: 1px solid #CBD5E1 !important; }
+        #TempMsModal input, #TtuModal input[type="text"], #TtuModal textarea, #TtuModal select { border: 1px solid #CBD5E1 !important; border-left: 1px solid #CBD5E1 !important; box-shadow: none !important; background-color: #FFFFFF !important; }
     </style>
 </head>
 <body>
 
-    <!-- MOBIL TOPBAR (Skjules automatisk på tablet i landscape) -->
+    <div id="themflow-splash">
+        <img src="ThemFlowSplash.jpg" alt="ThemFlow">
+        <div class="splash-track">
+            <div id="splash-bar"></div>
+        </div>
+    </div>
+
     <div class="topbar">
-        <h1 id="FirmaHeader">Logistikportal — Kassevask</h1>
+        <h1 id="FirmaHeader">ThemFlow — Kassevask</h1>
         <span id="TxtUgeTop">Uge --</span>
     </div>
 
     <div class="app-shell">
-
-        <!-- TABLET SIDEPANEL (Vises kun på tablet i landscape-visning) -->
         <aside class="tablet-sidebar">
             <div>
                 <div class="sidebar-brand">
-                    <h2 id="SidebarFirmaHeader">Them Mejeri</h2>
+                    <h2 id="SidebarFirmaHeader">ThemFlow | Them Mejeri</h2>
                     <p id="TxtUgeSidebar">Kassevask • Uge --</p>
                 </div>
-
                 <div class="sidebar-label">Egenkontrol &amp; Blanketter</div>
                 <nav class="sidebar-nav">
-                    <button class="side-doc-btn primary-doc" onclick="aabneRengoeringSkema()">
-                        <span>📋</span>
-                        <span>Rengørings skema</span>
-                    </button>
-
-                    <button class="side-doc-btn" onclick="aabnTempMsSkema()">
-                        <span>🌡️</span>
-                        <span>Registrér temperatur/Sim</span>
-                    </button>
-
-                                      <button class="side-doc-btn" onclick="aabnTtuSkema()">
-                        <span>📑</span>
-                        <span>TTU-Blanketter</span>
-                    </button>
-
-
-
-                    <button class="side-doc-btn" onclick="aabnBlanketModal('Afvigelsesblanketter')">
-                        <span>⚠️</span>
-                        <span>Afvigelsesblanketter</span>
-                    </button>
+                    <button class="side-doc-btn primary-doc" onclick="aabneRengoeringSkema()"><span>📋</span><span>Rengøringsskema</span></button>
+                    <button class="side-doc-btn" onclick="aabnTempMsSkema()"><span>🌡️</span><span>Registrér temperatur/MS</span></button>
+                    <button class="side-doc-btn" onclick="aabnTtuSkema()"><span>📑</span><span>TTU-Blanketter</span></button>
+                    <button class="side-doc-btn" onclick="aabnBlanketModal('Afvigelsesblanket')"><span>⚠️</span><span>Afvigelsesblanketter</span></button>
                 </nav>
             </div>
-
-            <div class="sidebar-footer">
-                Sendes direkte til ledelsens arkiv
-            </div>
+            <div class="sidebar-footer">Sendes direkte til ledelsens arkiv</div>
         </aside>
 
         <main class="main-workspace">
@@ -187,40 +191,26 @@
                         <h2>🧼 KASSEVASK &amp; MODTAGELSE</h2>
                         <p>Registrer vaskede Them-paller eller eksterne Arla-paller ind i kassehallen</p>
                     </div>
-
                     <div class="section-label">Indsæt paller i kassehallen (+)</div>
                     <div class="btn-stack">
-                        <button class="touch-btn btn-green" onclick="aabnPalleModal('Them', 78)">
-                            <span>📥 Indsæt vaskede Them-paller</span>
-                            <small>78 kasser pr. palle (Vaskehal)</small>
-                        </button>
-                        <button class="touch-btn btn-emerald-dark" onclick="aabnPalleModal('Arla', 90)">
-                            <span>🚚 Indsæt leverede Arla-paller</span>
-                            <small>90 kasser pr. palle (Ekstern leverance)</small>
-                        </button>
+                        <button class="touch-btn btn-green" onclick="aabnPalleModal('Them', 78)"><span>📥 Indsæt vaskede Them-paller</span><small>78 kasser pr. palle (Vaskehal)</small></button>
+                        <button class="touch-btn btn-emerald-dark" onclick="aabnPalleModal('Arla', 90)"><span>🚚 Indsæt leverede Arla-paller</span><small>90 kasser pr. palle (Ekstern leverance)</small></button>
                     </div>
                 </div>
-
-                <div class="panel-footer">
-                    Kassevask tilføjer udelukkende paller til kassehallens saldo.
-                </div>
+                <div class="panel-footer">Kassevask tilføjer udelukkende paller til kassehallens saldo.</div>
             </div>
         </main>
-
     </div>
-
     <!-- MODAL 1: ANTAL PALLER -->
     <div class="modal-backdrop" id="PalleModal">
         <div class="modal-card">
             <h3 class="modal-title" id="ModalTitel">Indsæt Them-paller</h3>
             <p class="modal-sub" id="ModalSub">78 kasser pr. palle</p>
-
             <div class="counter-row">
                 <button class="btn-step" onclick="justerAntal(-1)">−</button>
                 <input type="number" id="TxtAntalPaller" class="count-input" value="1" min="1" inputmode="numeric" pattern="[0-9]*" onfocus="this.select()">
                 <button class="btn-step" onclick="justerAntal(1)">+</button>
             </div>
-
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="lukPalleModal()">Annuller</button>
                 <button class="btn-confirm" id="BtnGodkendPaller" onclick="sendTilSkyen()">✔ Godkend</button>
@@ -231,40 +221,115 @@
     <!-- MODAL 2: EGENKONTROL RENGØRINGSSKEMA -->
     <div class="modal-backdrop" id="RengoeringModal">
         <div class="clean-modal-card">
-            <div class="clean-header">
-                <h3 id="TxtUgeHeader">Egenkontrol — Uge --</h3>
+            <div class="clean-header" style="background:#1E4363; color:white; padding:14px 18px; border-radius:10px;">
+                <div>
+                    <h3 id="TxtUgeHeader" style="margin:0; color:white;">Egenkontrol — Uge --</h3>
+                    <small style="color:#CBD5E1;">Ugentlig rengøringskontrol og visuel godkendelse</small>
+                </div>
                 <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukRengoeringModal()">✕ Luk</button>
             </div>
-
             <div class="clean-scroll">
                 <table>
                     <thead>
                         <tr>
                             <th style="text-align: left;">Kontrolpunkt</th>
-                            <th>Man</th>
-                            <th>Tir</th>
-                            <th>Ons</th>
-                            <th>Tor</th>
-                            <th>Fre</th>
-                            <th>Lør</th>
-                            <th>Søn</th>
-                            <th>Init.</th>
+                            <th>Man</th><th>Tir</th><th>Ons</th><th>Tor</th><th>Fre</th><th>Lør</th><th>Søn</th><th>Init.</th>
                         </tr>
                     </thead>
                     <tbody id="SkemaBody"></tbody>
                 </table>
             </div>
-
             <div class="clean-footer">
                 <button class="btn-confirm" id="BtnGemRengoering" style="width: 100%; padding: 16px;" onclick="gemRengoeringISkyen()">✔ Afslut Uge &amp; Send til Ledelse</button>
             </div>
         </div>
     </div>
 
-         <!-- MODAL 3: SIKKERHEDSREGISTRERING (TTU / ULYKKE) -->
-    <div class="modal-backdrop" id="TtuModal">
-        <div class="clean-modal-card" style="max-width: 860px;">
+    <!-- MODAL 4: TEMPERATUR & MS BLANKET -->
+    <div class="modal-backdrop" id="TempMsModal">
+        <div class="clean-modal-card" style="max-width: 820px;">
             <div class="clean-header" style="background:#1E4363; color:white; padding:14px 18px; border-radius:10px;">
+                <div>
+                    <h3 style="margin:0; color:white;">Kvittering af Temperatur – samt MS på vaskemaskinen</h3>
+                    <small style="color:#CBD5E1; font-weight:600;">Them Mejeri • Afsnit: 23.21 • Udgave: 4 (Dato: 08-01-2025)</small>
+                </div>
+                <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukTempMsModal()">✕ Luk</button>
+            </div>
+            <div style="background:#FFFFFF; border:1px solid #CBD5E1; padding:12px 14px; border-radius:8px; margin-bottom:14px; font-size:13px; color:#0F172A; font-weight:600;">
+                Der skal 3 gange dagligt tjekkes, at temperaturen ligger inden for <u>60–72 grader</u> – samt MS skal ligge mellem <u>3,0 til 4,0</u>. Afviges dette, tages der fat i nærmeste leder.
+            </div>
+            <div class="clean-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 26%;">Dato &amp; Tid</th>
+                            <th style="width: 25%;">Temperatur (60,0–72,0 °C)</th>
+                            <th style="width: 25%;">MS (3,00–4,00)</th>
+                            <th style="width: 24%;">Kvittering med initialer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="TempMsBody"></tbody>
+                </table>
+                <button type="button" onclick="tilfoejTempMsRaekke()" style="margin-top:12px; background:#FFFFFF; color:#0F172A; border:none; padding:12px 16px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; width:100%;">
+                    ➕ Tilføj ny kontrolrække (3x dagligt)
+                </button>
+            </div>
+            <div class="clean-footer" style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px;">
+                <button type="button" onclick="gemTempMsKladde(true)" style="background:#F0F9FF; color:#0369A1; border:2px solid #CBD5E1; border-radius:14px; padding:16px; font-size:15px; font-weight:700; cursor:pointer;">💾 Gem kladde til næste tjek</button>
+                <button type="button" class="btn-confirm" id="BtnGemTempMs" onclick="gemTempMsISkyen()">✔ Afslut &amp; Send til Ledelse</button>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL 5: AFVIGELSESBLANKET -->
+    <div class="modal-backdrop" id="BlanketModal">
+        <div class="clean-modal-card" style="max-width: 680px;">
+            <div class="clean-header" style="background: #1E4363; color: white; padding: 14px 18px; border-radius: 10px;">
+                <div>
+                    <h3 id="BlanketModalTitel" style="margin:0; color:white;">Afvigelsesblanket</h3>
+                    <small style="color:#CBD5E1; font-weight:600;">Registrering af afvigelse på temperatur, MS, rengøring eller udstyr</small>
+                </div>
+                <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukBlanketModal()">✕ Luk</button>
+            </div>
+            <div class="clean-scroll" style="padding-right:6px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:#475569;">Dato og tidspunkt:</label>
+                        <input type="text" id="AfvDato" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-weight:600;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:#475569;">Initialer:</label>
+                        <input type="text" id="AfvInit" placeholder="Skriv initialer" maxlength="6" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-weight:600; text-transform:uppercase;">
+                    </div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:12px; font-weight:700; color:#475569;">Type af afvigelse:</label>
+                    <select id="AfvType" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-weight:600; background:white;">
+                        <option value="Temperatur uden for 60–72 °C">Temperatur uden for 60–72 °C</option>
+                        <option value="MS uden for 3,0–4,0">MS uden for 3,0–4,0</option>
+                        <option value="Mangelfuld rengøring / kemi">Mangelfuld rengøring / kemi</option>
+                        <option value="Defekt udstyr / maskinstop">Defekt udstyr / maskinstop</option>
+                        <option value="Anden afvigelse">Anden afvigelse</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:12px; font-weight:700; color:#475569;">Beskrivelse af afvigelsen:</label>
+                    <textarea id="AfvBeskrivelse" rows="3" placeholder="Beskriv hvad der afviger..." style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-size:14px;"></textarea>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:12px; font-weight:700; color:#475569;">Korrigerende handling (Hvad er der gjort / hvem er kontaktet?):</label>
+                    <textarea id="AfvHandling" rows="2" placeholder="F.eks. kontaktet nærmeste leder, justeret kemi..." style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-size:14px;"></textarea>
+                </div>
+            </div>
+            <div class="clean-footer">
+                <button type="button" class="btn-confirm" id="BtnGemAfvigelse" style="width:100%; padding:16px;" onclick="gemAfvigelseISkyen()">✔ Send Afvigelse til Ledelse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: SIKKERHEDSREGISTRERING (TTU / ULYKKE) -->
+    <div class="modal-backdrop" id="TtuModal">
+        <div class="clean-modal-card" style="max-width: 860px; background: #FFFFFF;">
+            <div class="clean-header" style="background: #1E4363; color: white; padding: 14px 18px; border-radius: 10px;">
                 <div>
                     <h3 style="margin:0; color:white;">SIKKERHEDSREGISTRERING – MEJERI</h3>
                     <small style="color:#CBD5E1;">Registrering af tilløb til ulykke (TTU) samt ulykker med og uden fravær</small>
@@ -273,8 +338,7 @@
             </div>
 
             <div class="clean-scroll" style="padding-right:6px;">
-                <!-- 1. HÆNDELSESTYPE -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">1. HÆNDELSESTYPE (Vælg én)</div>
+                <div style="background: #1E4363; color: white; font-weight: 800; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-size: 13px;">1. HÆNDELSESTYPE (Vælg én)</div>
                 <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px; padding:0 4px;">
                     <label style="display:flex; align-items:center; gap:10px; font-weight:600; font-size:14px; cursor:pointer;">
                         <input type="radio" name="ttuType" value="TTU – Tilløb til ulykke / Nærved-ulykke" checked style="width:20px; height:20px;">
@@ -290,8 +354,7 @@
                     </label>
                 </div>
 
-                <!-- 2. TID, STED OG INVOLVEREDE -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">2. TID, STED OG INVOLVEREDE</div>
+                <div style="background: #1E4363; color: white; font-weight: 800; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-size: 13px;">2. TID, STED OG INVOLVEREDE</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
                     <div>
                         <label style="font-size:12px; font-weight:700; color:#475569;">Dato og tidspunkt:</label>
@@ -304,11 +367,11 @@
                 </div>
                 <div style="margin-bottom:10px;">
                     <label style="font-size:12px; font-weight:700; color:#475569;">Involveret / tilskadekommen (navn &amp; stilling):</label>
-                    <input type="text" id="TtuInvolveret" placeholder="Navn og stilling (hvis relevant)" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px;">
+                    <input type="text" id="TtuInvolveret" placeholder="Navn og stilling (hvis relevant)" style="width: 100%; padding: 10px; border: 1px solid #CBD5E1; border-radius:8px; font-weight: 600;">
                 </div>
                 <div style="margin-bottom:16px;">
                     <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:6px;">Afdeling / Procesområde:</label>
-                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #F3F5F8; padding: 10px; border-radius: 8px; border: 1px solid #E2E8F0;">
                         <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Tårnlager" style="width:18px; height:18px;"> Tårnlager</label>
                         <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Pakkeri" style="width:18px; height:18px;"> Pakkeri</label>
                         <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kit 1" style="width:18px; height:18px;"> Kit 1</label>
@@ -316,13 +379,11 @@
                         <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kølerum" style="width:18px; height:18px;"> Kølerum</label>
                         <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kit 2" style="width:18px; height:18px;"> Kit 2</label>
                         <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Klargøring" style="width:18px; height:18px;"> Klargøring</label>
-                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kassevask" checked style="width:18px; height:18px;"> Kassevask</label>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kassevask" style="width:18px; height:18px;"> Kassevask</label>
                         <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-afd" value="Kit 3" style="width:18px; height:18px;"> Kit 3</label>
                     </div>
                 </div>
-
-                <!-- 3. BESKRIVELSE & FOREBYGGELSE -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">3. BESKRIVELSE &amp; FOREBYGGELSE (Skriv med egne ord)</div>
+                <div style="background: #1E4363; color: white; font-weight: 800; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-size: 13px;">3. BESKRIVELSE &amp; FOREBYGGELSE (Skriv med egne ord)</div>
                 <div style="margin-bottom:10px;">
                     <label style="font-size:12px; font-weight:700; color:#475569;">Hvad skete der? (Hvad var du i gang med, og hvordan opstod situationen?)</label>
                     <textarea id="TtuHvadSkete" rows="3" style="width:100%; padding:10px; border:1px solid #CBD5E1; border-radius:8px; font-size:14px;"></textarea>
@@ -345,9 +406,9 @@
                         </select>
                     </div>
                 </div>
-                <!-- 4. MEJERI-SPECIFIKKE RISIKOFAKTORER -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">4. MEJERI-SPECIFIKKE RISIKOFAKTORER (Sæt gerne flere kryds)</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:16px;">
+
+                <div style="background: #1E4363; color: white; font-weight: 800; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-size: 13px;">4. MEJERI-SPECIFIKKE RISIKOFAKTORER (Sæt gerne flere kryds)</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#FFFFFF; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:16px;">
                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Glat gulv / Vådt miljø" style="width:18px; height:18px;"> Glat gulv / Vådt miljø (valle, mælk, vand, sæbe)</label>
                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Kemi og CIP" style="width:18px; height:18px;"> Kemi og CIP (syre/lud, pakninger, afspærring)</label>
                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Varme / Kulde" style="width:18px; height:18px;"> Varme / Kulde (damp, varmt vand, køle-/frostrum)</label>
@@ -358,9 +419,8 @@
                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Instruktion / Planlægning" style="width:18px; height:18px;"> Instruktion / Planlægning (travlhed, oplæring, SOP)</label>
                 </div>
 
-                <!-- 5. STRAKSHANDLING -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">5. STRAKSHANDLING (Hvad blev gjort her og nu for at sikre stedet?)</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:8px;">
+                <div style="background: #1E4363; color: white; font-weight: 800; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-size: 13px;">5. STRAKSHANDLING (Hvad blev gjort her og nu for at sikre stedet?)</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#FFFFFF; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:8px;">
                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Tørret op / rengjort / afspærret område" style="width:18px; height:18px;"> Tørret op / rengjort / afspærret område</label>
                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Maskine stoppet / mærket ude af drift" style="width:18px; height:18px;"> Maskine stoppet / mærket ude af drift</label>
                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Ydet førstehjælp / sendt til læge" style="width:18px; height:18px;"> Ydet førstehjælp / sendt til læge</label>
@@ -369,67 +429,20 @@
                 <small style="color:#64748B; display:block; text-align:center; margin-bottom:8px;">Punkt 6–7 (5 x Hvorfor &amp; opfølgning) udfyldes automatisk af AMO / leder i ledelsens Excel-rapport.</small>
             </div>
 
-            <div class="clean-footer">
+            <div class="clean-footer" style="display:grid; grid-template-columns: 1fr 2fr; gap:10px;">
+                <button type="button" onclick="rydTtuKladde(true)" style="background: #F0F9FF; color: #0369A1; border: 2px solid #CBD5E1; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer;">🗑️ Ryd formular</button>
                 <button type="button" class="btn-confirm" id="BtnGemTtu" style="width:100%; padding:16px;" onclick="gemTtuISkyen()">✔ Send Sikkerhedsregistrering til Ledelse / AMO</button>
             </div>
         </div>
     </div>
-
-    <!-- MODAL 4: TEMPERATUR & MS BLANKET (AFSNIT 23.21) -->
-    <div class="modal-backdrop" id="TempMsModal">
-        <div class="clean-modal-card" style="max-width: 820px;">
-            <div class="clean-header">
-                <div>
-                    <h3 style="margin:0;">Kvittering af Temperatur – samt MS på vaskemaskinen</h3>
-                    <small style="color:#64748B; font-weight:600;">Them Mejeri • Afsnit: 23.21 • Udgave: 4 (Dato: 08-01-2025)</small>
-                </div>
-                <button class="btn-cancel" style="padding: 10px 16px;" onclick="lukTempMsModal()">✕ Luk</button>
-            </div>
-
-            <!-- Lovpligtig kontroltekst fra blanketten -->
-            <div style="background:#F1F5F9; border:1px solid #CBD5E1; border-left:5px solid #0284C7; padding:12px 14px; border-radius:8px; margin-bottom:14px; font-size:13px; color:#0F172A; font-weight:600;">
-                Der skal 3 gange dagligt tjekkes, at temperaturen ligger inden for <u>60–72 grader</u> – samt MS skal ligge mellem <u>3,0 til 4,0</u>. Afviges dette, tages der fat i nærmeste leder.
-            </div>
-
-            <div class="clean-scroll">
-                <table>
-                                       <thead>
-                        <tr>
-                            <th style="width: 26%;">Dato &amp; Tid</th>
-                            <th style="width: 25%;">Temperatur (60,0–72,0 °C)</th>
-                            <th style="width: 25%;">MS (3,00–4,00)</th>
-                            <th style="width: 24%;">Kvittering med initialer</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="TempMsBody"></tbody>
-                </table>
-
-                <button type="button" onclick="tilfoejTempMsRaekke()" style="margin-top:12px; background:#E2E8F0; color:#0F172A; border:none; padding:12px 16px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; width:100%;">
-                    ➕ Tilføj ny kontrolrække (3x dagligt)
-                </button>
-            </div>
-
-            <div class="clean-footer" style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px;">
-                <button type="button" onclick="gemTempMsKladde(true)" style="background:#0284C7; color:white; border:none; border-radius:14px; padding:16px; font-size:15px; font-weight:700; cursor:pointer;">
-                    💾 Gem kladde til næste tjek
-                </button>
-                <button type="button" class="btn-confirm" id="BtnGemTempMs" onclick="gemTempMsISkyen()">
-                    ✔ Afslut &amp; Send til Ledelse
-                </button>
-            </div>
-        </div>
-    </div>
-    
-
-        <script>
-        const SUPABASE_URL = "https://pfzpjcwbeysqfqrzlhba.supabase.co";
+    <script>
+        const SUPABASE_URL = "https://supabase.co";
         const SUPABASE_KEY = "sb_publishable_WtPN9JEmymnRQP-wcFOlOQ_zPHL823K";
 
         let _valgtPalleNavn = "";
         let _kasserPrPalle = 0;
         let _aktuelUge = 1;
-        let _aktivtFirma = "Logistikportal";
+        let _aktivtFirma = "ThemFlow";
 
         function beregnUgeNummer(dato) {
             const d = new Date(Date.UTC(dato.getFullYear(), dato.getMonth(), dato.getDate()));
@@ -439,9 +452,28 @@
             return Math.ceil((((d - aarStart) / 86400000) + 1) / 7);
         }
 
+        function hentNuDatoTid() {
+            const nu = new Date();
+            const dag = String(nu.getDate()).padStart(2, '0');
+            const mdr = String(nu.getMonth() + 1).padStart(2, '0');
+            const aar = nu.getFullYear();
+            const kl = String(nu.getHours()).padStart(2, '0') + ":" + String(nu.getMinutes()).padStart(2, '0');
+            return dag + "-" + mdr + "-" + aar + " kl. " + kl;
+        }
+
         _aktuelUge = beregnUgeNummer(new Date());
 
         document.addEventListener("DOMContentLoaded", function () {
+            const bar = document.getElementById('splash-bar');
+            const splash = document.getElementById('themflow-splash');
+            if (bar) setTimeout(() => { bar.style.width = '100%'; }, 50);
+            setTimeout(() => {
+                if (splash) {
+                    splash.style.opacity = '0';
+                    splash.style.visibility = 'hidden';
+                }
+            }, 1800);
+
             if (window.location.protocol.startsWith("http")) {
                 const manifestLink = document.createElement("link");
                 manifestLink.rel = "manifest";
@@ -455,7 +487,7 @@
                 localStorage.setItem('valgtFirmaNavn', firmaFraUrl.trim());
             }
 
-            _aktivtFirma = localStorage.getItem('valgtFirmaNavn') || "Logistikportal";
+            _aktivtFirma = localStorage.getItem('valgtFirmaNavn') || "ThemFlow";
             document.title = _aktivtFirma + " - Kassevask";
             document.getElementById('FirmaHeader').innerText = _aktivtFirma + " — Kassevask";
             document.getElementById('TxtUgeTop').innerText = "Uge " + _aktuelUge;
@@ -468,8 +500,13 @@
             bygRengoeringsTabel();
         });
 
+        /* AFVIGELSESBLANKET */
         function aabnBlanketModal(titel) {
             document.getElementById('BlanketModalTitel').innerText = titel + " — Uge " + _aktuelUge;
+            document.getElementById('AfvDato').value = hentNuDatoTid();
+            document.getElementById('AfvInit').value = "";
+            document.getElementById('AfvBeskrivelse').value = "";
+            document.getElementById('AfvHandling').value = "";
             document.getElementById('BlanketModal').style.display = 'flex';
         }
 
@@ -477,6 +514,51 @@
             document.getElementById('BlanketModal').style.display = 'none';
         }
 
+        async function gemAfvigelseISkyen() {
+            const init = document.getElementById('AfvInit').value.trim().toUpperCase();
+            const beskrivelse = document.getElementById('AfvBeskrivelse').value.trim();
+
+            if (!init || !beskrivelse) {
+                alert("⚠️ Udfyld venligst både 'Initialer' og 'Beskrivelse af afvigelsen'.");
+                return;
+            }
+
+            const btn = document.getElementById('BtnGemAfvigelse');
+            btn.disabled = true;
+            btn.innerText = "⏳ Sender...";
+
+            try {
+                const response = await fetch(SUPABASE_URL + "/rest/v1/afvigelser_kassevask", {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        uge: Number(_aktuelUge),
+                        dato_tid: document.getElementById('AfvDato').value.trim(),
+                        initialer: init,
+                        type: document.getElementById('AfvType').value,
+                        beskrivelse: beskrivelse,
+                        korrigerende_handling: document.getElementById('AfvHandling').value.trim()
+                    })
+                });
+
+                if (!response.ok) throw new Error(await response.text());
+
+                lukBlanketModal();
+                alert("✔ AFVIGELSE SENDT:\nAfvigelsesblanketten for uge " + _aktuelUge + " er sendt til ledelsen.");
+            } catch (err) {
+                alert("Fejl ved afsendelse: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "✔ Send Afvigelse til Ledelse";
+            }
+        }
+
+        /* PALLEREGISTRERING */
         function aabnPalleModal(navn, kasser) {
             _valgtPalleNavn = navn;
             _kasserPrPalle = kasser;
@@ -539,41 +621,12 @@
                 btn.innerText = "✔ Godkend";
             }
         }
+        /* RENGØRINGSSKEMA */
         function bygRengoeringsTabel() {
             const zoner = [
-                {
-                    titel: "1. ROBOTLINJEN",
-                    prefix: "r",
-                    punkter: [
-                        "Fjernelse/spuling af rester fra gulv",
-                        "Vask af gulv",
-                        "Spuling af hele robotlinjen inkl. bånd",
-                        "Udlægning af skumprodukter jf. procedure",
-                        "Visuel kontrol efter endt rengøring"
-                    ]
-                },
-                {
-                    titel: "2. ALULINJEN",
-                    prefix: "a",
-                    punkter: [
-                        "Fjernelse/spuling af rester fra gulv",
-                        "Vask af gulv",
-                        "Spuling af hele Alulinjen inkl. bånd",
-                        "Udlægning af skumprodukter jf. procedure",
-                        "Visuel kontrol efter endt rengøring"
-                    ]
-                },
-                {
-                    titel: "3. FLOWPAKLINJEN INKL. HØVLOMRÅDE",
-                    prefix: "f",
-                    punkter: [
-                        "Fjernelse/spuling af rester fra gulv",
-                        "Vask af gulv",
-                        "Aftørring af indløbsbånd i begge ender",
-                        "Rensning af kniv efter endt arbejde",
-                        "Udlægning af skumprodukter jf. procedure"
-                    ]
-                }
+                { titel: "1. ROBOTLINJEN", prefix: "r", punkter: ["Fjernelse/spuling af rester fra gulv", "Vask af gulv", "Spuling af hele robotlinjen inkl. bånd", "Udlægning af skumprodukter jf. procedure", "Visuel kontrol efter endt rengøring"] },
+                { titel: "2. ALULINJEN", prefix: "a", punkter: ["Fjernelse/spuling af rester fra gulv", "Vask af gulv", "Spuling af hele Alulinjen inkl. bånd", "Udlægning af skumprodukter jf. procedure", "Visuel kontrol efter endt rengøring"] },
+                { titel: "3. FLOWPAKLINJEN INKL. HØVLOMRÅDE", prefix: "f", punkter: ["Fjernelse/spuling af rester fra gulv", "Vask af gulv", "Aftørring af indløbsbånd i begge ender", "Rensning af kniv efter endt arbejde", "Udlægning af skumprodukter jf. procedure"] }
             ];
 
             const tbody = document.getElementById('SkemaBody');
@@ -603,9 +656,7 @@
 
         function gemLokalKladde() {
             const valgteIds = [];
-            document.querySelectorAll('.chk-cell input:checked').forEach(chk => {
-                valgteIds.push(chk.getAttribute('data-id'));
-            });
+            document.querySelectorAll('.chk-cell input:checked').forEach(chk => { valgteIds.push(chk.getAttribute('data-id')); });
 
             const raekkeInit = {};
             document.querySelectorAll('.row-init').forEach(inp => {
@@ -613,11 +664,7 @@
                 if (val) raekkeInit[inp.getAttribute('data-rowinit')] = val;
             });
 
-            localStorage.setItem('rengoering_kladde_uge_' + _aktuelUge, JSON.stringify({
-                uge: _aktuelUge,
-                checked: valgteIds,
-                rowInits: raekkeInit
-            }));
+            localStorage.setItem('rengoering_kladde_uge_' + _aktuelUge, JSON.stringify({ uge: _aktuelUge, checked: valgteIds, rowInits: raekkeInit }));
         }
 
         function aabneRengoeringSkema() {
@@ -631,29 +678,14 @@
             if (gemtTekst) {
                 try {
                     const kladde = JSON.parse(gemtTekst);
-                    if (kladde.checked) {
-                        kladde.checked.forEach(id => {
-                            const el = document.querySelector('input[data-id="' + id + '"]');
-                            if (el) el.checked = true;
-                        });
-                    }
-                    if (kladde.rowInits) {
-                        Object.keys(kladde.rowInits).forEach(rId => {
-                            const inp = document.querySelector('input[data-rowinit="' + rId + '"]');
-                            if (inp) inp.value = kladde.rowInits[rId];
-                        });
-                    }
-                } catch (e) {
-                    localStorage.removeItem('rengoering_kladde_uge_' + _aktuelUge);
-                }
+                    if (kladde.checked) kladde.checked.forEach(id => { const el = document.querySelector('input[data-id="' + id + '"]'); if (el) el.checked = true; });
+                    if (kladde.rowInits) Object.keys(kladde.rowInits).forEach(rId => { const inp = document.querySelector('input[data-rowinit="' + rId + '"]'); if (inp) inp.value = kladde.rowInits[rId]; });
+                } catch (e) { localStorage.removeItem('rengoering_kladde_uge_' + _aktuelUge); }
             }
-
             document.getElementById('RengoeringModal').style.display = 'flex';
         }
 
-        function lukRengoeringModal() {
-            document.getElementById('RengoeringModal').style.display = 'none';
-        }
+        function lukRengoeringModal() { document.getElementById('RengoeringModal').style.display = 'none'; }
 
         async function gemRengoeringISkyen() {
             const dage = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
@@ -716,7 +748,7 @@
                 btn.innerText = "✔ Afslut Uge & Send til Ledelse";
             }
         }
-               /* TEMPERATUR & MS BLANKET */
+        /* TEMPERATUR & MS BLANKET */
         function aabnTempMsSkema() {
             const tbody = document.getElementById('TempMsBody');
             if (!tbody) return;
@@ -726,17 +758,10 @@
             if (gemt) {
                 try {
                     const raekker = JSON.parse(gemt);
-                    if (raekker.length > 0) {
-                        raekker.forEach(r => tilfoejTempMsRaekke(r.dato, r.temp, r.ms, r.init));
-                    } else {
-                        tilfoejTempMsRaekke();
-                    }
-                } catch (e) {
-                    tilfoejTempMsRaekke();
-                }
-            } else {
-                tilfoejTempMsRaekke();
-            }
+                    if (raekker.length > 0) raekker.forEach(r => tilfoejTempMsRaekke(r.dato, r.temp, r.ms, r.init));
+                    else tilfoejTempMsRaekke();
+                } catch (e) { tilfoejTempMsRaekke(); }
+            } else { tilfoejTempMsRaekke(); }
 
             document.getElementById('TempMsModal').style.display = 'flex';
         }
@@ -798,9 +823,7 @@
                 const temp = tr.querySelector('.tms-temp').value.trim();
                 const ms = tr.querySelector('.tms-ms').value.trim();
                 const init = tr.querySelector('.tms-init').value.trim().toUpperCase();
-                if (temp || ms || init) {
-                    data.push({ dato: dato, temp: temp, ms: ms, init: init });
-                }
+                if (temp || ms || init) data.push({ dato: dato, temp: temp, ms: ms, init: init });
             });
             return data;
         }
@@ -808,23 +831,15 @@
         function gemTempMsKladde(visBesked) {
             const data = hentTempMsRaekkerFraDom();
             localStorage.setItem('temp_ms_kladde_uge_' + _aktuelUge, JSON.stringify(data));
-            if (visBesked) {
-                alert("💾 Kladde gemt på tabletten! Du kan fortsætte næste tjek senere på dagen.");
-            }
+            if (visBesked) alert("💾 Kladde gemt på tabletten! Du kan fortsætte næste tjek senere på dagen.");
         }
 
         async function gemTempMsISkyen() {
             const raekker = hentTempMsRaekkerFraDom();
-            if (raekker.length === 0) {
-                alert("⚠️ Indtast venligst mindst én måling før afsendelse.");
-                return;
-            }
+            if (raekker.length === 0) { alert("⚠️ Indtast venligst mindst én måling før afsendelse."); return; }
 
             for (const r of raekker) {
-                if ((r.temp || r.ms) && !r.init) {
-                    alert("⚠️ Alle udfyldte rækker skal kvitteres med initialer!");
-                    return;
-                }
+                if ((r.temp || r.ms) && !r.init) { alert("⚠️ Alle udfyldte rækker skal kvitteres med initialer!"); return; }
             }
 
             const btn = document.getElementById('BtnGemTempMs');
@@ -840,10 +855,7 @@
                         'Content-Type': 'application/json',
                         'Prefer': 'return=minimal'
                     },
-                    body: JSON.stringify({
-                        uge: _aktuelUge,
-                        registreringer: JSON.stringify(raekker)
-                    })
+                    body: JSON.stringify({ uge: _aktuelUge, registreringer: JSON.stringify(raekker) })
                 });
 
                 if (!response.ok) throw new Error(await response.text());
@@ -858,43 +870,93 @@
                 btn.innerText = "✔ Afslut & Send til Ledelse";
             }
         }
-                <!-- 4. MEJERI-SPECIFIKKE RISIKOFAKTORER -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">4. MEJERI-SPECIFIKKE RISIKOFAKTORER (Sæt gerne flere kryds)</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:16px;">
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Glat gulv / Vådt miljø" style="width:18px; height:18px;"> Glat gulv / Vådt miljø (valle, mælk, vand, sæbe)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Kemi og CIP" style="width:18px; height:18px;"> Kemi og CIP (syre/lud, pakninger, afspærring)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Varme / Kulde" style="width:18px; height:18px;"> Varme / Kulde (damp, varmt vand, køle-/frostrum)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Maskiner og pakkelinjer" style="width:18px; height:18px;"> Maskiner og pakkelinjer (klemfare, bånd, afskærmning)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Ergonomi / tunge løft" style="width:18px; height:18px;"> Ergonomi / tunge løft (oste, sække, kasser, EGA)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Intern trafik" style="width:18px; height:18px;"> Intern trafik (truck, palleløfter, travlhed v. rampe)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Værnemidler / PV" style="width:18px; height:18px;"> Værnemidler / PV (manglende sko, handsker, briller)</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-risiko" value="Instruktion / Planlægning" style="width:18px; height:18px;"> Instruktion / Planlægning (travlhed, oplæring, SOP)</label>
-                </div>
+ /* SIKKERHEDSREGISTRERING (TTU) MED AUTOMATISK KLADDE */
+        const TTU_KLADDE_KEY = 'ttu_kladde_kassevask';
 
-                <!-- 5. STRAKSHANDLING -->
-                <div style="background:#0284C7; color:white; font-weight:800; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;">5. STRAKSHANDLING (Hvad blev gjort her og nu for at sikre stedet?)</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0; margin-bottom:8px;">
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Tørret op / rengjort / afspærret område" style="width:18px; height:18px;"> Tørret op / rengjort / afspærret område</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Maskine stoppet / mærket ude af drift" style="width:18px; height:18px;"> Maskine stoppet / mærket ude af drift</label>
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;"><input type="checkbox" class="ttu-straks" value="Ydet førstehjælp / sendt til læge" style="width:18px; height:18px;"> Ydet førstehjælp / sendt til læge</label>
-                    <input type="text" id="TtuStraksAndet" placeholder="Andet (skriv kort)..." style="padding:8px; border:1px solid #CBD5E1; border-radius:6px; font-size:13px;">
-                </div>
-                <small style="color:#64748B; display:block; text-align:center; margin-bottom:8px;">Punkt 6–7 (5 x Hvorfor &amp; opfølgning) udfyldes automatisk af AMO / leder i ledelsens Excel-rapport.</small>
-            </div>
+        function gemTtuKladde() {
+            const valgtType = document.querySelector('input[name="ttuType"]:checked');
+            const kladde = {
+                ttuType: valgtType ? valgtType.value : "TTU – Tilløb til ulykke / Nærved-ulykke",
+                dato: document.getElementById('TtuDato').value,
+                indberetter: document.getElementById('TtuIndberetter').value,
+                involveret: document.getElementById('TtuInvolveret').value,
+                afdelinger: Array.from(document.querySelectorAll('.ttu-afd:checked')).map(c => c.value),
+                hvadSkete: document.getElementById('TtuHvadSkete').value,
+                forebyggelse: document.getElementById('TtuForebyggelse').value,
+                skade: document.getElementById('TtuSkade').value,
+                behandling: document.getElementById('TtuBehandling').value,
+                risici: Array.from(document.querySelectorAll('.ttu-risiko:checked')).map(c => c.value),
+                straks: Array.from(document.querySelectorAll('.ttu-straks:checked')).map(c => c.value),
+                straksAndet: document.getElementById('TtuStraksAndet').value
+            };
+            localStorage.setItem(TTU_KLADDE_KEY, JSON.stringify(kladde));
+        }
 
-            <div class="clean-footer">
-                <button type="button" class="btn-confirm" id="BtnGemTtu" style="width:100%; padding:16px;" onclick="gemTtuISkyen()">✔ Send Sikkerhedsregistrering til Ledelse / AMO</button>
-            </div>
-        </div>
-    </div>
+        function nulstilTtuFelter() {
+            document.getElementById('TtuDato').value = hentNuDatoTid();
+            document.getElementById('TtuIndberetter').value = "";
+            document.getElementById('TtuInvolveret').value = "";
+            document.getElementById('TtuHvadSkete').value = "";
+            document.getElementById('TtuForebyggelse').value = "";
+            document.getElementById('TtuSkade').value = "";
+            document.getElementById('TtuStraksAndet').value = "";
+            document.getElementById('TtuBehandling').selectedIndex = 0;
+
+            document.querySelectorAll('input[name="ttuType"]').forEach((r, idx) => r.checked = (idx === 0));
+            document.querySelectorAll('.ttu-afd').forEach(c => c.checked = false);
+            document.querySelectorAll('.ttu-risiko').forEach(c => c.checked = false);
+            document.querySelectorAll('.ttu-straks').forEach(c => c.checked = false);
+        }
+
+        function rydTtuKladde(spoergFoerst) {
+            if (spoergFoerst && !confirm("Er du sikker på, at du vil slette kladden og starte forfra?")) return;
+            localStorage.removeItem(TTU_KLADDE_KEY);
+            nulstilTtuFelter();
+        }
+
+        function aabnTtuSkema() {
+            nulstilTtuFelter();
+
+            const gemtTekst = localStorage.getItem(TTU_KLADDE_KEY);
+            if (gemtTekst) {
+                try {
+                    const k = JSON.parse(gemtTekst);
+                    if (k.dato) document.getElementById('TtuDato').value = k.dato;
+                    if (k.indberetter) document.getElementById('TtuIndberetter').value = k.indberetter;
+                    if (k.involveret) document.getElementById('TtuInvolveret').value = k.involveret;
+                    if (k.hvadSkete) document.getElementById('TtuHvadSkete').value = k.hvadSkete;
+                    if (k.forebyggelse) document.getElementById('TtuForebyggelse').value = k.forebyggelse;
+                    if (k.skade) document.getElementById('TtuSkade').value = k.skade;
+                    if (k.behandling) document.getElementById('TtuBehandling').value = k.behandling;
+                    if (k.straksAndet) document.getElementById('TtuStraksAndet').value = k.straksAndet;
+
+                    if (k.ttuType) document.querySelectorAll('input[name="ttuType"]').forEach(r => r.checked = (r.value === k.ttuType));
+                    if (Array.isArray(k.afdelinger)) document.querySelectorAll('.ttu-afd').forEach(c => c.checked = k.afdelinger.includes(c.value));
+                    if (Array.isArray(k.risici)) document.querySelectorAll('.ttu-risiko').forEach(c => c.checked = k.risici.includes(c.value));
+                    if (Array.isArray(k.straks)) document.querySelectorAll('.ttu-straks').forEach(c => c.checked = k.straks.includes(c.value));
+                } catch (e) { localStorage.removeItem(TTU_KLADDE_KEY); }
+            }
+
+            const ttuModal = document.getElementById('TtuModal');
+            if (!ttuModal.dataset.autoSaveAttached) {
+                ttuModal.addEventListener('input', gemTtuKladde);
+                ttuModal.addEventListener('change', gemTtuKladde);
+                ttuModal.dataset.autoSaveAttached = "true";
+            }
+
+            document.getElementById('TtuModal').style.display = 'flex';
+        }
+
+        function lukTtuModal() {
+            gemTtuKladde();
+            document.getElementById('TtuModal').style.display = 'none';
+        }
+
         async function gemTtuISkyen() {
             const indberetter = document.getElementById('TtuIndberetter').value.trim();
             const hvadSkete = document.getElementById('TtuHvadSkete').value.trim();
 
-            if (!indberetter || !hvadSkete) {
-                alert("⚠️ Udfyld venligst både 'Indberettet af' og 'Hvad skete der?'.");
-                return;
-            }
+            if (!indberetter || !hvadSkete) { alert("⚠️ Udfyld venligst både 'Indberettet af' og 'Hvad skete der?'."); return; }
 
             const valgtTypeEl = document.querySelector('input[name="ttuType"]:checked');
             const haendelsestype = valgtTypeEl ? valgtTypeEl.value : "TTU – Tilløb til ulykke";
@@ -936,7 +998,8 @@
 
                 if (!response.ok) throw new Error(await response.text());
 
-                lukTtuModal();
+                rydTtuKladde(false);
+                document.getElementById('TtuModal').style.display = 'none';
                 alert("✔ SIKKERHEDSREGISTRERING SENDT:\nIndberetningen er nu gemt hos ledelsen og arbejdsmiljøgruppen (AMO).");
             } catch (err) {
                 alert("Fejl ved afsendelse: " + err.message);
@@ -945,8 +1008,6 @@
                 btn.innerText = "✔ Send Sikkerhedsregistrering til Ledelse / AMO";
             }
         }
-
     </script>
 </body>
 </html>
-
