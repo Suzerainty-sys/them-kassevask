@@ -13,6 +13,7 @@
     <meta name="apple-mobile-web-app-title" content="ThemFlow Kassevask">
     <link rel="icon" type="image/jpeg" href="ThemFlowApp.jpg">
     <link rel="apple-touch-icon" href="ThemFlowApp.jpg">
+<link rel="manifest" href="manifest.json">
 
     <style>
         .row-init { width: 58px; padding: 6px 4px; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; border: 1px solid #CBD5E1; border-radius: 6px; background: #F8FAFC; }
@@ -474,13 +475,7 @@
                 }
             }, 1800);
 
-            if (window.location.protocol.startsWith("http")) {
-                const manifestLink = document.createElement("link");
-                manifestLink.rel = "manifest";
-                manifestLink.href = "manifest.json";
-                document.head.appendChild(manifestLink);
-            }
-
+            
             const urlParams = new URLSearchParams(window.location.search);
             const firmaFraUrl = urlParams.get('firma');
             if (firmaFraUrl && firmaFraUrl.trim() !== "") {
